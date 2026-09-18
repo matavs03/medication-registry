@@ -19,13 +19,16 @@ public class Medication {
     @Column(nullable = false, length = 20)
     private String id;
 
+    @Column(length = 1000)
     private String inn;
 
+    @Column(length = 1000)
     private String dosageForm;
 
+    @Column(length = 1000)
     private String manufacturer;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String name;
 
     private String atc;
