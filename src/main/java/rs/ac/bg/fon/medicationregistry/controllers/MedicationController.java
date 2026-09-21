@@ -9,7 +9,7 @@ import rs.ac.bg.fon.medicationregistry.dtos.MedicationShortViewDto;
 import rs.ac.bg.fon.medicationregistry.services.MedicationService;
 
 @RestController
-@RequestMapping("/medications")
+@RequestMapping("/api/v1/medications")
 public class MedicationController {
 
     private final MedicationService medicationService;

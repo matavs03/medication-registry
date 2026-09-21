@@ -23,6 +23,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuth(AlimsUnavailableException e) {
+        log.error("Pogresni kredencijali", e);
+        return build(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception e) {
         log.error("Neocekivana greska", e);
