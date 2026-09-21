@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.bg.fon.medicationregistry.dtos.MedicationFullViewDto;
+import rs.ac.bg.fon.medicationregistry.dtos.MedicationSearchCriteria;
 import rs.ac.bg.fon.medicationregistry.dtos.MedicationShortViewDto;
 import rs.ac.bg.fon.medicationregistry.services.MedicationService;
 
@@ -18,9 +19,10 @@ public class MedicationController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<MedicationShortViewDto>> findAll(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<MedicationShortViewDto>> findAll(MedicationSearchCriteria criteria,
+                                                                @RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "50") int size){
-        return ResponseEntity.ok(medicationService.findAll(page, size));
+        return ResponseEntity.ok(medicationService.findAll(criteria, page, size));
     }
 
     @GetMapping("/{id}")
