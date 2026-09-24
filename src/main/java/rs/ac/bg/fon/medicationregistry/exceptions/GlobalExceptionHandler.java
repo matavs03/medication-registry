@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuth(AlimsUnavailableException e) {
+    public ResponseEntity<ErrorResponse> handleAuth(AuthenticationException e) {
         log.error("Pogresni kredencijali", e);
         return build(HttpStatus.UNAUTHORIZED, e.getMessage());
     }
