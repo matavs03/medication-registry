@@ -1,6 +1,9 @@
 package rs.ac.bg.fon.medicationregistry.storage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import rs.ac.bg.fon.medicationregistry.domain.StoredFile;
@@ -8,11 +11,13 @@ import rs.ac.bg.fon.medicationregistry.exceptions.FileStorageException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class FileStorageService {
 
@@ -58,6 +63,28 @@ public class FileStorageService {
         }
         int dot =  fileName.lastIndexOf('.');
         return dot == -1 ? "" : fileName.substring(dot);
+    }
+
+    public Resource loadFile(StoredFile storedFile) {
+        Path target = root.resolve(storedFile.getFilePath());
+
+        try {
+            Resource resource = new UrlResource(target.toUri());
+            if(!resource.exists() || !resource.isReadable()) {
+                throw new FileStorageException("File not found: " + storedFile.getOriginalFileName());
+            }
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new FileStorageException("Malformed URL", e);
+        }
+    }
+
+    public void deleteFile(StoredFile storedFile) {
+        try {
+            Files.deleteIfExists(root.resolve(storedFile.getFilePath()));
+        } catch (IOException e) {
+            log.warn("Cannot delete file {}", storedFile.getFilePath(), e);
+        }
     }
 
 }
