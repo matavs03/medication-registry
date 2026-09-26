@@ -101,7 +101,7 @@ public class LetterService {
         StoredFile storedFile = letter.getStoredFile();
 
         Resource resource = fileStorageService.loadFile(storedFile);
-        return new FileDownload(storedFile.getOriginalFileName(), storedFile.getFileType(), `resource);
+        return new FileDownload(storedFile.getOriginalFileName(), storedFile.getFileType(), resource);
     }
 
     private LetterFullViewDto convertToDto(Letter letter){
