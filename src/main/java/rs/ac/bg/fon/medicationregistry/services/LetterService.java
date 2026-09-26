@@ -1,5 +1,10 @@
 package rs.ac.bg.fon.medicationregistry.services;
 
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,16 +14,14 @@ import rs.ac.bg.fon.medicationregistry.domain.Letter;
 import rs.ac.bg.fon.medicationregistry.domain.Medication;
 import rs.ac.bg.fon.medicationregistry.domain.StoredFile;
 import rs.ac.bg.fon.medicationregistry.dtos.*;
+import rs.ac.bg.fon.medicationregistry.exceptions.LetterNotFoundException;
 import rs.ac.bg.fon.medicationregistry.exceptions.MedicationNotFoundException;
 import rs.ac.bg.fon.medicationregistry.repositories.AdminRepository;
 import rs.ac.bg.fon.medicationregistry.repositories.LetterRepository;
 import rs.ac.bg.fon.medicationregistry.repositories.MedicationRepository;
 import rs.ac.bg.fon.medicationregistry.storage.FileStorageService;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class LetterService {
@@ -57,6 +60,48 @@ public class LetterService {
         letterRepository.save(letter);
 
         return convertToDto(letter);
+    }
+
+    @Transactional
+    public void deleteLetter(UUID id){
+        Letter letter = letterRepository.findById(id)
+                        .orElseThrow(() -> new LetterNotFoundException("Couldn't find letter with id " + id));
+
+        StoredFile storedFile = letter.getStoredFile();
+
+        letterRepository.delete(letter);
+        letterRepository.flush();
+
+        fileStorageService.deleteFile(storedFile);
+    }
+
+    @Transactional(readOnly = true)
+    public LetterFullViewDto getLetter(UUID id){
+        Letter letter = letterRepository.findById(id)
+                        .orElseThrow(() -> new LetterNotFoundException("Couldn't find letter with id " + id));
+        return convertToDto(letter);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LetterShortViewDto> findAll(int page, int size){
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, 100);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by("createdAt").descending());
+
+        Page<Letter> letters = letterRepository.findAll(pageable);
+
+        return letters.map(l -> new LetterShortViewDto(l.getId(), l.getTitle(), l.getCreatedAt()));
+    }
+
+    @Transactional(readOnly = true)
+    public FileDownload downloadLetter(UUID id){
+        Letter letter = letterRepository.findById(id)
+                .orElseThrow(() -> new LetterNotFoundException("Couldn't find letter with id " + id));
+        StoredFile storedFile = letter.getStoredFile();
+
+        Resource resource = fileStorageService.loadFile(storedFile);
+        return new FileDownload(storedFile.getOriginalFileName(), storedFile.getFileType(), `resource);
     }
 
     private LetterFullViewDto convertToDto(Letter letter){
