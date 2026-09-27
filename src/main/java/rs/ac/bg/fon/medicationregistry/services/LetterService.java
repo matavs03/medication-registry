@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import rs.ac.bg.fon.medicationregistry.exceptions.MedicationNotFoundException;
 import rs.ac.bg.fon.medicationregistry.repositories.AdminRepository;
 import rs.ac.bg.fon.medicationregistry.repositories.LetterRepository;
 import rs.ac.bg.fon.medicationregistry.repositories.MedicationRepository;
+import rs.ac.bg.fon.medicationregistry.specifications.LetterSpecifications;
 import rs.ac.bg.fon.medicationregistry.storage.FileStorageService;
 
 import java.util.*;
@@ -83,13 +85,18 @@ public class LetterService {
     }
 
     @Transactional(readOnly = true)
-    public Page<LetterShortViewDto> findAll(int page, int size){
+    public Page<LetterShortViewDto> findAll(LetterSearchCriteria criteria, int page, int size){
         int safePage = Math.max(page, 0);
         int safeSize = Math.clamp(size, 1, 100);
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by("createdAt").descending());
 
-        Page<Letter> letters = letterRepository.findAll(pageable);
+        Specification<Letter> spec = Specification.allOf(
+                LetterSpecifications.titleContains(criteria.title()),
+                LetterSpecifications.hasMedication(criteria.medicationId())
+        );
+
+        Page<Letter> letters = letterRepository.findAll(spec, pageable);
 
         return letters.map(l -> new LetterShortViewDto(l.getId(), l.getTitle(), l.getCreatedAt()));
     }
