@@ -1,5 +1,9 @@
 package rs.ac.bg.fon.medicationregistry.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +78,25 @@ public class EducationalMaterialService {
         for(StoredFile storedFile : educationalMaterial.getStoredFiles()){
             fileStorageService.deleteFile(storedFile);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public EducationalMaterialFullViewDto getEducationalMaterial(UUID id) {
+        EducationalMaterial educationalMaterial = educationalMaterialRepository.findById(id)
+                .orElseThrow(() -> new EducationalMaterialNotFoundException("Educational material not found"));
+        return convertToDto(educationalMaterial);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EducationalMaterialShortViewDto> findAll(int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, 100);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by("createdAt").descending());
+
+        Page<EducationalMaterial> educationalMaterials = educationalMaterialRepository.findAll(pageable);
+
+        return educationalMaterials.map(em -> new EducationalMaterialShortViewDto(em.getId(), em.getTitle(), em.getCreatedAt()));
     }
 
 
