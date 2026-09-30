@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record EducationalMaterialFullViewDto(UUID id, String title, String description, LocalDateTime createdAt, List<MedicationShortViewDto> medications, AdminDto admin, List<StoredFileDto> storedFile) {
+public record EducationalMaterialFullViewDto(UUID id, String title, String description, LocalDateTime createdAt, List<MedicationShortViewDto> medications, AdminDto admin, List<StoredFileDto> storedFiles) {
 }

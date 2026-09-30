@@ -10,10 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import rs.ac.bg.fon.medicationregistry.domain.Admin;
-import rs.ac.bg.fon.medicationregistry.domain.Letter;
-import rs.ac.bg.fon.medicationregistry.domain.Medication;
-import rs.ac.bg.fon.medicationregistry.domain.StoredFile;
+import rs.ac.bg.fon.medicationregistry.domain.*;
 import rs.ac.bg.fon.medicationregistry.dtos.*;
 import rs.ac.bg.fon.medicationregistry.exceptions.LetterNotFoundException;
 import rs.ac.bg.fon.medicationregistry.exceptions.MedicationNotFoundException;
@@ -110,6 +107,7 @@ public class LetterService {
         Resource resource = fileStorageService.loadFile(storedFile);
         return new FileDownload(storedFile.getOriginalFileName(), storedFile.getFileType(), resource);
     }
+
 
     private LetterFullViewDto convertToDto(Letter letter){
         List<MedicationShortViewDto> medicationsDto = new ArrayList<>();

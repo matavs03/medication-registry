@@ -1,9 +1,11 @@
 package rs.ac.bg.fon.medicationregistry.services;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +16,12 @@ import rs.ac.bg.fon.medicationregistry.domain.Medication;
 import rs.ac.bg.fon.medicationregistry.domain.StoredFile;
 import rs.ac.bg.fon.medicationregistry.dtos.*;
 import rs.ac.bg.fon.medicationregistry.exceptions.EducationalMaterialNotFoundException;
+import rs.ac.bg.fon.medicationregistry.exceptions.FileStorageException;
 import rs.ac.bg.fon.medicationregistry.exceptions.MedicationNotFoundException;
 import rs.ac.bg.fon.medicationregistry.repositories.AdminRepository;
 import rs.ac.bg.fon.medicationregistry.repositories.EducationalMaterialRepository;
 import rs.ac.bg.fon.medicationregistry.repositories.MedicationRepository;
+import rs.ac.bg.fon.medicationregistry.specifications.EducationalMaterialSpecifications;
 import rs.ac.bg.fon.medicationregistry.storage.FileStorageService;
 
 import java.util.*;
@@ -42,6 +46,10 @@ public class EducationalMaterialService {
 
     @Transactional
     public EducationalMaterialFullViewDto createEducationalMaterial(CreateEducationalMaterialDto request, List<MultipartFile> files, String username) {
+        if(files == null || files.isEmpty()) {
+            throw new FileStorageException("There are no files to upload");
+        }
+
         Set<Medication> medications = new HashSet<>(medicationRepository.findAllById(request.medicationsIds()));
 
         if(medications.size() != request.medicationsIds().size()) throw new MedicationNotFoundException("Medications not found");
@@ -72,10 +80,11 @@ public class EducationalMaterialService {
     public void deleteEducationalMaterial(UUID id) {
         EducationalMaterial educationalMaterial = educationalMaterialRepository.findById(id)
                 .orElseThrow(() -> new EducationalMaterialNotFoundException("Educational material not found"));
+        List<StoredFile> storedFiles = educationalMaterial.getStoredFiles();
         educationalMaterialRepository.delete(educationalMaterial);
         educationalMaterialRepository.flush();
 
-        for(StoredFile storedFile : educationalMaterial.getStoredFiles()){
+        for(StoredFile storedFile : storedFiles){
             fileStorageService.deleteFile(storedFile);
         }
     }
@@ -88,15 +97,33 @@ public class EducationalMaterialService {
     }
 
     @Transactional(readOnly = true)
-    public Page<EducationalMaterialShortViewDto> findAll(int page, int size) {
+    public Page<EducationalMaterialShortViewDto> findAll(int page, int size, EducationalMaterialSearchCriteria criteria) {
         int safePage = Math.max(page, 0);
         int safeSize = Math.clamp(size, 1, 100);
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by("createdAt").descending());
 
-        Page<EducationalMaterial> educationalMaterials = educationalMaterialRepository.findAll(pageable);
+        Specification<EducationalMaterial> spec = Specification.allOf(
+                EducationalMaterialSpecifications.hasMedication(criteria.medicationId()),
+                EducationalMaterialSpecifications.titleContains(criteria.title())
+        );
+
+        Page<EducationalMaterial> educationalMaterials = educationalMaterialRepository.findAll(spec, pageable);
 
         return educationalMaterials.map(em -> new EducationalMaterialShortViewDto(em.getId(), em.getTitle(), em.getCreatedAt()));
+    }
+
+    @Transactional(readOnly = true)
+    public FileDownload downlaodEducationalMaterialFile(UUID materialId, UUID fileId){
+        EducationalMaterial educationalMaterial = educationalMaterialRepository.findById(materialId)
+                .orElseThrow(() -> new EducationalMaterialNotFoundException("Educational material not found"));
+
+        StoredFile storedFile = educationalMaterial.getStoredFiles().stream()
+                .filter(f -> f.getId().equals(fileId))
+                .findFirst().orElseThrow(() -> new FileStorageException("File does not belong to this Educational Material"));
+
+        Resource resource = fileStorageService.loadFile(storedFile);
+        return new FileDownload(storedFile.getOriginalFileName(), storedFile.getFileType(), resource);
     }
 
 
