@@ -114,7 +114,7 @@ public class EducationalMaterialService {
     }
 
     @Transactional(readOnly = true)
-    public FileDownload downlaodEducationalMaterialFile(UUID materialId, UUID fileId){
+    public FileDownload downloadEducationalMaterialFile(UUID materialId, UUID fileId){
         EducationalMaterial educationalMaterial = educationalMaterialRepository.findById(materialId)
                 .orElseThrow(() -> new EducationalMaterialNotFoundException("Educational material not found"));
 

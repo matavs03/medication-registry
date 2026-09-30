@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,7 +31,7 @@ public class LetterController {
     public ResponseEntity<LetterFullViewDto> createLetter(@Valid @RequestPart("letter") CreateLetterRequest request,
                                        @RequestPart("file") MultipartFile file,
                                        Authentication authentication) {
-        return ResponseEntity.ok(letterService.createLetter(request,file,authentication.getName()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(letterService.createLetter(request, file, authentication.getName()));
     }
 
     @GetMapping
