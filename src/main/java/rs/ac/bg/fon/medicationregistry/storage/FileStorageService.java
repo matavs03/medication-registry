@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -22,6 +23,14 @@ import java.util.UUID;
 public class FileStorageService {
 
     private final Path root;
+
+    public static final Set<String> PDF_ONLY = Set.of("application/pdf");
+
+    public static final Set<String> MATERIAL_TYPES = Set.of(
+            "application/pdf",
+            "image/jpeg", "image/png", "image/gif", "image/webp",
+            "video/mp4", "video/webm"
+    );
 
     public FileStorageService(@Value("${storage.location}") String storageLocation) {
         this.root = Paths.get(storageLocation).toAbsolutePath().normalize();
@@ -32,9 +41,14 @@ public class FileStorageService {
         }
     }
 
-    public StoredFile storeFile(MultipartFile file) {
+    public StoredFile storeFile(MultipartFile file, Set<String> allowedTypes) {
         if(file.isEmpty()) {
             throw new FileStorageException("Cannot store empty file");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !allowedTypes.contains(contentType)) {
+            throw new FileStorageException("Nedozvoljen tip fajla: " + contentType);
         }
 
         UUID id = UUID.randomUUID();

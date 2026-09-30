@@ -47,7 +47,7 @@ public class LetterService {
         Admin admin = adminRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Couldn't find admin with given username"));
 
-        StoredFile storedFile = fileStorageService.storeFile(file);
+        StoredFile storedFile = fileStorageService.storeFile(file, FileStorageService.PDF_ONLY);
 
         Letter letter = new  Letter();
         letter.setMedications(medications);

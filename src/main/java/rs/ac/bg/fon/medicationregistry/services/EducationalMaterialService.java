@@ -60,7 +60,7 @@ public class EducationalMaterialService {
         List<StoredFile> storedFiles = new ArrayList<>();
 
         for(MultipartFile file : files){
-            StoredFile storedFile = fileStorageService.storeFile(file);
+            StoredFile storedFile = fileStorageService.storeFile(file, FileStorageService.MATERIAL_TYPES);
             storedFiles.add(storedFile);
         }
 
