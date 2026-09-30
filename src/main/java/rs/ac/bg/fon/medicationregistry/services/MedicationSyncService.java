@@ -3,6 +3,10 @@ package rs.ac.bg.fon.medicationregistry.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +16,7 @@ import rs.ac.bg.fon.medicationregistry.domain.SyncLog;
 import rs.ac.bg.fon.medicationregistry.domain.SyncStatus;
 import rs.ac.bg.fon.medicationregistry.dtos.AlimsMedicationDto;
 import rs.ac.bg.fon.medicationregistry.dtos.AlimsResponseDto;
+import rs.ac.bg.fon.medicationregistry.dtos.SyncLogDto;
 import rs.ac.bg.fon.medicationregistry.exceptions.AlimsUnavailableException;
 import rs.ac.bg.fon.medicationregistry.integration.AlimsClient;
 import rs.ac.bg.fon.medicationregistry.repositories.MedicationRepository;
@@ -48,7 +53,7 @@ public class MedicationSyncService {
 
     @Scheduled(cron = "${alims.sync-cron}")
     @Transactional
-    public void syncMedication(){
+    public SyncLogDto syncMedication(){
         SyncLog syncLog = new SyncLog();
 
         try {
@@ -77,7 +82,7 @@ public class MedicationSyncService {
                 syncLog.setStatus(SyncStatus.REJECTED);
                 syncLog.setMessage("Received count was lower than allowed");
                 syncLogRepository.save(syncLog);
-                return;
+                return new SyncLogDto(syncLog.getId(), syncLog.getSyncDateTime(), syncLog.getReceivedCount(), syncLog.getChangedCount(), syncLog.getStatus(), syncLog.getMessage());
             }
 
 
@@ -128,6 +133,18 @@ public class MedicationSyncService {
         }
 
         syncLogRepository.save(syncLog);
+        return new SyncLogDto(syncLog.getId(), syncLog.getSyncDateTime(), syncLog.getReceivedCount(), syncLog.getChangedCount(), syncLog.getStatus(), syncLog.getMessage());
+    }
+
+    public Page<SyncLogDto> findAll(int page, int size){
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.clamp(size, 1, 100);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by("syncDateTime").descending());
+
+        Page<SyncLog> logs = syncLogRepository.findAll(pageable);
+
+        return logs.map(l -> new SyncLogDto(l.getId(), l.getSyncDateTime(), l.getReceivedCount(), l.getChangedCount(), l.getStatus(), l.getMessage()));
     }
 
 
