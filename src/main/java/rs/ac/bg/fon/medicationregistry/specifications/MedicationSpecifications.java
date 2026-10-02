@@ -24,6 +24,6 @@ public final class MedicationSpecifications {
 
     public static Specification<Medication> innContains(String inn){
         return (root, query, cb) -> inn==null || inn.isBlank() ? null
-                : cb.like(cb.lower(root.get("name")), "%" + inn.toLowerCase() + "%");
+                : cb.like(cb.lower(root.get("inn")), "%" + inn.toLowerCase() + "%");
     }
 }

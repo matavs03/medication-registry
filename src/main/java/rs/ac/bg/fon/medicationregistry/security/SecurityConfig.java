@@ -34,8 +34,12 @@ public class SecurityConfig {
 
     private final String jwtSecret;
 
-    public SecurityConfig(@Value("${security.jwt.secret}") String jwtSecret) {
+    private final String url;
+
+    public SecurityConfig(@Value("${security.jwt.secret}") String jwtSecret,
+                          @Value("${cors.allowed-origin}") String url) {
         this.jwtSecret = jwtSecret;
+        this.url = url;
     }
 
     @Bean
@@ -86,7 +90,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of(url));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Content-Disposition"));
