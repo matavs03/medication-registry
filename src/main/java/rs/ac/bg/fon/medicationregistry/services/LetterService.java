@@ -90,7 +90,8 @@ public class LetterService {
 
         Specification<Letter> spec = Specification.allOf(
                 LetterSpecifications.titleContains(criteria.title()),
-                LetterSpecifications.hasMedication(criteria.medicationId())
+                LetterSpecifications.hasMedication(criteria.medicationId()),
+                LetterSpecifications.medicationNameContains(criteria.medicationName())
         );
 
         Page<Letter> letters = letterRepository.findAll(spec, pageable);

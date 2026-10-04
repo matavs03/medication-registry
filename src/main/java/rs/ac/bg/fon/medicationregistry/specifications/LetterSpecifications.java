@@ -3,6 +3,8 @@ package rs.ac.bg.fon.medicationregistry.specifications;
 import org.springframework.data.jpa.domain.Specification;
 import rs.ac.bg.fon.medicationregistry.domain.Letter;
 
+import java.util.Locale;
+
 public final class LetterSpecifications {
 
     private LetterSpecifications() {
@@ -16,6 +18,11 @@ public final class LetterSpecifications {
     public static Specification<Letter> hasMedication(String medicationId){
         return (root, query, cb) -> medicationId == null || medicationId.isBlank() ? null
                 : cb.equal(root.join("medications").get("id"), medicationId);
+    }
+
+    public static Specification<Letter> medicationNameContains(String medicationName){
+        return (root, query, cb) -> medicationName == null || medicationName.isBlank() ? null
+                : cb.like(cb.lower(root.join("medications").get("name")),"%" +  medicationName.toLowerCase() + "%");
     }
 
 }

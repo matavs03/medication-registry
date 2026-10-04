@@ -105,7 +105,8 @@ public class EducationalMaterialService {
 
         Specification<EducationalMaterial> spec = Specification.allOf(
                 EducationalMaterialSpecifications.hasMedication(criteria.medicationId()),
-                EducationalMaterialSpecifications.titleContains(criteria.title())
+                EducationalMaterialSpecifications.titleContains(criteria.title()),
+                EducationalMaterialSpecifications.medicationNameContains(criteria.medicationName())
         );
 
         Page<EducationalMaterial> educationalMaterials = educationalMaterialRepository.findAll(spec, pageable);

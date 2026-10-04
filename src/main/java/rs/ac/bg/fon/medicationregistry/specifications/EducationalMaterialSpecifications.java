@@ -19,4 +19,9 @@ public final class EducationalMaterialSpecifications {
                 : cb.equal(root.join("medications").get("id"), medicationId);
     }
 
+    public static Specification<EducationalMaterial> medicationNameContains(String medicationName){
+        return (root, query, cb) -> medicationName == null || medicationName.isBlank() ? null
+                : cb.like(cb.lower(root.join("medications").get("name")),"%" +  medicationName.toLowerCase() + "%");
+    }
+
 }
