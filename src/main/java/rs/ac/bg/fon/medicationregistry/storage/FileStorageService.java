@@ -29,7 +29,16 @@ public class FileStorageService {
     public static final Set<String> MATERIAL_TYPES = Set.of(
             "application/pdf",
             "image/jpeg", "image/png", "image/gif", "image/webp",
-            "video/mp4", "video/webm"
+            "video/mp4", "video/webm",
+            "application/pdf",
+            "image/jpeg", "image/png", "image/gif", "image/webp",
+            "video/mp4", "video/webm",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",   // .docx
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",         // .xlsx
+            "application/msword",        // .doc
+            "application/vnd.ms-excel",  // .xls
+            "application/vnd.ms-powerpoint" // .ppt
     );
 
     public FileStorageService(@Value("${storage.location}") String storageLocation) {
