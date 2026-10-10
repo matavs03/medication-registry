@@ -104,7 +104,6 @@ public class EducationalMaterialService {
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by("createdAt").descending());
 
         Specification<EducationalMaterial> spec = Specification.allOf(
-                EducationalMaterialSpecifications.hasMedication(criteria.medicationId()),
                 EducationalMaterialSpecifications.titleContains(criteria.title()),
                 EducationalMaterialSpecifications.medicationNameContains(criteria.medicationName())
         );

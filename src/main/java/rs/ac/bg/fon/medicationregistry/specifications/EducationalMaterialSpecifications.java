@@ -14,10 +14,6 @@ public final class EducationalMaterialSpecifications {
                 : cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
     }
 
-    public static Specification<EducationalMaterial> hasMedication(String medicationId){
-        return (root, query, cb) -> medicationId == null || medicationId.isBlank() ? null
-                : cb.equal(root.join("medications").get("id"), medicationId);
-    }
 
     public static Specification<EducationalMaterial> medicationNameContains(String medicationName){
         return (root, query, cb) -> medicationName == null || medicationName.isBlank() ? null
