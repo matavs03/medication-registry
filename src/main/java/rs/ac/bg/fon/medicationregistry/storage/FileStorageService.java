@@ -30,9 +30,6 @@ public class FileStorageService {
             "application/pdf",
             "image/jpeg", "image/png", "image/gif", "image/webp",
             "video/mp4", "video/webm",
-            "application/pdf",
-            "image/jpeg", "image/png", "image/gif", "image/webp",
-            "video/mp4", "video/webm",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",   // .docx
             "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",         // .xlsx
