@@ -3,6 +3,7 @@ package rs.ac.bg.fon.medicationregistry.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +19,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({MedicationNotFoundException.class,
             LetterNotFoundException.class,
-            EducationalMaterialNotFoundException.class})
+            EducationalMaterialNotFoundException.class,
+            AdminNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException e) {
         return build(HttpStatus.NOT_FOUND, e.getMessage());
     }
@@ -47,6 +49,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTooLarge(MaxUploadSizeExceededException e) {
         return build(HttpStatus.PAYLOAD_TOO_LARGE, "Fajl je prevelik");
     }
+
+
+    @ExceptionHandler({NonValidAdminActivationException.class,
+            NonValidAdminDeactivationException.class,
+            NonValidPasswordException.class,
+            UsernameAlreadyExistsException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException e) {
+        return build(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(AuthorizationDeniedException e) {
+        return build(HttpStatus.FORBIDDEN, "Nemate ovlašćenje za ovu akciju");
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException e) {
+        log.error("Greska pri radu sa fajlom", e);
+        return build(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception e) {

@@ -30,12 +30,12 @@ public class FileStorageService {
             "application/pdf",
             "image/jpeg", "image/png", "image/gif", "image/webp",
             "video/mp4", "video/webm",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",   // .docx
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",         // .xlsx
-            "application/msword",        // .doc
-            "application/vnd.ms-excel",  // .xls
-            "application/vnd.ms-powerpoint" // .ppt
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/msword",
+            "application/vnd.ms-excel",
+            "application/vnd.ms-powerpoint"
     );
 
     public FileStorageService(@Value("${storage.location}") String storageLocation) {
@@ -49,7 +49,7 @@ public class FileStorageService {
 
     public StoredFile storeFile(MultipartFile file, Set<String> allowedTypes) {
         if(file.isEmpty()) {
-            throw new FileStorageException("Cannot store empty file");
+            throw new FileStorageException("Nije moguce sacuvati prazan fajl");
         }
 
         String contentType = file.getContentType();
