@@ -55,12 +55,13 @@ public class AuthService {
                 .issuedAt(now)
                 .expiresAt(expiresAt)
                 .subject(admin.getUsername())
+                .claim("scope", "ROLE_" + admin.getRole().name())
                 .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
 
-        return new AuthResponse(token, admin.getUsername(), admin.getFirstName(), admin.getLastName(), expiresAt);
+        return new AuthResponse(token, admin.getUsername(), admin.getFirstName(), admin.getLastName(), admin.getRole(), expiresAt);
     }
 
     @Transactional

@@ -27,7 +27,7 @@ public class AuthController {
     @PutMapping("/password")
     public ResponseEntity<Void> changeOwnPassword(@Valid @RequestBody ChangePasswordDto request,
                                                   Authentication authentication) {
-        authService.changeOwnPassword(request.oldPassword(), request.newPassword(), authentication.getName());
+        authService.changeOwnPassword(authentication.getName(), request.oldPassword(), request.newPassword());
         return ResponseEntity.noContent().build();
     }
 
