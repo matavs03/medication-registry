@@ -100,7 +100,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void changePassword(UUID id, String newPassword){
+    public void resetPassword(UUID id, String newPassword){
         Admin admin = adminRepository.findById(id)
                 .orElseThrow(() -> new AdminNotFoundException("Admin nije pronadjen"));
 

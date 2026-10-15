@@ -28,7 +28,7 @@ public class AuthController {
     public ResponseEntity<Void> changeOwnPassword(@Valid @RequestBody ChangePasswordDto request,
                                                   Authentication authentication) {
         authService.changeOwnPassword(request.oldPassword(), request.newPassword(), authentication.getName());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }
