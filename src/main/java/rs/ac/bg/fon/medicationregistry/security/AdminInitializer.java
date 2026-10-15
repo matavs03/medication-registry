@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import rs.ac.bg.fon.medicationregistry.domain.Admin;
+import rs.ac.bg.fon.medicationregistry.domain.AdminRole;
 import rs.ac.bg.fon.medicationregistry.repositories.AdminRepository;
 
 @Component
@@ -38,6 +39,8 @@ public class AdminInitializer implements CommandLineRunner {
         admin.setPassword(passwordEncoder.encode(password));
         admin.setFirstName("Podrazumevani");
         admin.setLastName("Administrator");
+        admin.setRole(AdminRole.SUPER_ADMIN);
+        admin.setActive(true);
         adminRepository.save(admin);
         log.info("Kreiran pocetni administrator: {}", username);
 

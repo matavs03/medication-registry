@@ -24,7 +24,8 @@ public class AdminDetailsService implements UserDetailsService {
 
         return User.withUsername(admin.getUsername())
                 .password(admin.getPassword())
-                .roles("ADMIN")
+                .roles(admin.getRole().name())
+                .disabled(!admin.isActive())
                 .build();
     }
 }
